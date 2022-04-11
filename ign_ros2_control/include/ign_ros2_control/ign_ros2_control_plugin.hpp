@@ -19,44 +19,44 @@
 
 #include <memory>
 
+#include "IgnitionROS2ControlPluginPrivate.hpp"
+
 namespace ign_ros2_control
 {
-// Forward declarations.
-class IgnitionROS2ControlPluginPrivate;
+  class IgnitionROS2ControlPlugin : public ignition::gazebo::System,
+                                    public ignition::gazebo::ISystemConfigure,
+                                    public ignition::gazebo::ISystemPreUpdate,
+                                    public ignition::gazebo::ISystemPostUpdate
+  {
+    public:
+      /// \brief Constructor
+      IgnitionROS2ControlPlugin();
 
-class IgnitionROS2ControlPlugin
-  : public ignition::gazebo::System,
-  public ignition::gazebo::ISystemConfigure,
-  public ignition::gazebo::ISystemPreUpdate,
-  public ignition::gazebo::ISystemPostUpdate
-{
-public:
-  /// \brief Constructor
-  IgnitionROS2ControlPlugin();
+      /// \brief Destructor
+      ~IgnitionROS2ControlPlugin() override;
 
-  /// \brief Destructor
-  ~IgnitionROS2ControlPlugin() override;
+      // Documentation inherited
+      void Configure(
+        const ignition::gazebo::Entity & _entity,
+        const std::shared_ptr<const sdf::Element> & _sdf,
+        ignition::gazebo::EntityComponentManager & _ecm,
+        ignition::gazebo::EventManager & _eventMgr
+      ) override;
 
-  // Documentation inherited
-  void Configure(
-    const ignition::gazebo::Entity & _entity,
-    const std::shared_ptr<const sdf::Element> & _sdf,
-    ignition::gazebo::EntityComponentManager & _ecm,
-    ignition::gazebo::EventManager & _eventMgr) override;
+      // Documentation inherited
+      void PreUpdate(const ignition::gazebo::UpdateInfo & _info, ignition::gazebo::EntityComponentManager & _ecm) override;
 
-  // Documentation inherited
-  void PreUpdate(
-    const ignition::gazebo::UpdateInfo & _info,
-    ignition::gazebo::EntityComponentManager & _ecm) override;
+      void PostUpdate(const ignition::gazebo::UpdateInfo & _info, const ignition::gazebo::EntityComponentManager & _ecm) override;
 
-  void PostUpdate(
-    const ignition::gazebo::UpdateInfo & _info,
-    const ignition::gazebo::EntityComponentManager & _ecm) override;
+      // Custom Funcs
+      void initialize();
+      void configHardwarePlugin(std::string, std::map<std::string, ignition::gazebo::Entity>, Robot*, ignition::gazebo::EntityComponentManager &);
+      void importRobotDescription(const ignition::gazebo::Entity &, const std::shared_ptr<const sdf::Element> &, ignition::gazebo::EntityComponentManager &);
 
-private:
-  /// \brief Private data pointer.
-  std::unique_ptr<IgnitionROS2ControlPluginPrivate> dataPtr;
-};
+    private:
+      /// \brief Private data pointer.
+      std::unique_ptr<IgnitionROS2ControlPluginPrivate> ignRos2ControlPtr;
+  };
 }  // namespace ign_ros2_control
 
 #endif  // IGN_ROS2_CONTROL__IGN_ROS2_CONTROL_PLUGIN_HPP_
