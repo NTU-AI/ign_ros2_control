@@ -203,6 +203,14 @@ namespace ign_ros2_control
         this->dataPtr->imus_.push_back(imuData);
         return true;
       });
+
+    this->dataPtr->ecm->Each<ignition::gazebo::components::Lidar, ignition::gazebo::components::Name>(
+      [&](const ignition::gazebo::Entity & _entity,
+      const ignition::gazebo::components::Lidar *,
+      const ignition::gazebo::components::Name * _name) -> bool {
+        return true;
+      }
+    );
   }
 
   hardware_interface::return_type IgnitionSystem::configure(const hardware_interface::HardwareInfo & actuator_info)
@@ -286,8 +294,8 @@ namespace ign_ros2_control
 
         std::string vel = "Velocity: " +  std::to_string(this->dataPtr->joints_[i].joint_velocity_cmd);
 
-        std::cout << handle <<std::endl;
-        std::cout << vel <<std::endl;
+        //std::cout << handle <<std::endl;
+        //std::cout << vel <<std::endl;
 
         if (!this->dataPtr->ecm->Component<ignition::gazebo::components::JointVelocityCmd>(
             this->dataPtr->joints_[i].sim_joint))

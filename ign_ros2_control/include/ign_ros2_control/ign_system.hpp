@@ -23,9 +23,11 @@
 #include <utility>
 
 #include <ignition/msgs/imu.pb.h>
+#include <ignition/msgs/laserscan.pb.h>
 
 #include <ignition/gazebo/components/AngularVelocity.hh>
 #include <ignition/gazebo/components/Imu.hh>
+#include <ignition/gazebo/components/Lidar.hh>
 #include <ignition/gazebo/components/JointForce.hh>
 #include <ignition/gazebo/components/JointForceCmd.hh>
 #include <ignition/gazebo/components/JointPosition.hh>
