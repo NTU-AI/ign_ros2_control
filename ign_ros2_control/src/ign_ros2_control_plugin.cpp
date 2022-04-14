@@ -254,6 +254,9 @@ namespace ign_ros2_control {
 
     const YAML::Node &node = config["controller_manager"]["ros__parameters"];
     for(const auto& it : node ){
+
+      //std::cout << "CONTROLLER ENTREI: " + it.first.as<std::string>() << std::endl;
+
       if(it.first.as<std::string>().compare("update_rate") == 0)
         currentRobot->controller_manager_->declare_parameter(it.first.as<std::string>() , it.second.as<int>());
       else{
@@ -263,6 +266,9 @@ namespace ign_ros2_control {
           prefix = robot_name + "_";
 
         currentRobot->controller_manager_->declare_parameter(prefix + it.first.as<std::string>()+".type" , it.second["type"].as<std::string>() );
+
+        //std::cout << "CONTROLLER: " + prefix + it.first.as<std::string>()+".type" << std::endl;
+        //std::cout << it.second["type"].as<std::string>() << std::endl;
       }
     }
     

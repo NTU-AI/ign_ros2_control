@@ -204,13 +204,13 @@ namespace ign_ros2_control
         return true;
       });
 
-    this->dataPtr->ecm->Each<ignition::gazebo::components::Lidar, ignition::gazebo::components::Name>(
-      [&](const ignition::gazebo::Entity & _entity,
-      const ignition::gazebo::components::Lidar *,
-      const ignition::gazebo::components::Name * _name) -> bool {
-        return true;
-      }
-    );
+    // this->dataPtr->ecm->Each<ignition::gazebo::components::Lidar, ignition::gazebo::components::Name>(
+    //   [&](const ignition::gazebo::Entity & _entity,
+    //   const ignition::gazebo::components::Lidar *,
+    //   const ignition::gazebo::components::Name * _name) -> bool {
+    //     return true;
+    //   }
+    // );
   }
 
   hardware_interface::return_type IgnitionSystem::configure(const hardware_interface::HardwareInfo & actuator_info)
