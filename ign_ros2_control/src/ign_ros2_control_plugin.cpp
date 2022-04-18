@@ -253,6 +253,8 @@ namespace ign_ros2_control {
     YAML::Node config = YAML::LoadFile(paramFileName);
 
     const YAML::Node &node = config["controller_manager"]["ros__parameters"];
+    std::vector<std::string> start_controllers;
+    std::vector<std::string> stop_controllers;
     for(const auto& it : node ){
 
       //std::cout << "CONTROLLER ENTREI: " + it.first.as<std::string>() << std::endl;
@@ -265,13 +267,36 @@ namespace ign_ros2_control {
         if(!robot_name.empty())
           prefix = robot_name + "_";
 
-        currentRobot->controller_manager_->declare_parameter(prefix + it.first.as<std::string>()+".type" , it.second["type"].as<std::string>() );
+        std::string controller_name = prefix + it.first.as<std::string>();
+        std::string controller_type = it.second["type"].as<std::string>();
+
+        currentRobot->controller_manager_->declare_parameter(controller_name+".type" , controller_type);
 
         //std::cout << "CONTROLLER: " + prefix + it.first.as<std::string>()+".type" << std::endl;
         //std::cout << it.second["type"].as<std::string>() << std::endl;
+        currentRobot->controller_manager_->load_controller(controller_name , controller_type);
+
+        std::string ntu_gazebo_share_directory = ament_index_cpp::get_package_share_directory("ntu_gazebo");
+
+        std::string cmd = "ros2 param load " + controller_name + " "+ ntu_gazebo_share_directory + it.second["filepath"].as<std::string>();
+        std::system(cmd.c_str());
+
+        currentRobot->controller_manager_->configure_controller(controller_name);
+        
+        start_controllers.push_back(controller_name);
       }
     }
-    
+
+    //std::cout << "STARTING " << start_controllers.size() << " CONTROLLERS" << std::endl;
+    std::string cmd = "ros2 control switch_controllers -c " + currentRobot->getNamespace()+"/"+currentRobot->getCM_Nodename() + " --start";
+    for(auto controller : start_controllers){
+      cmd = cmd + " " + controller;
+    }
+    cmd = cmd + " &";
+    std::system(cmd.c_str());
+    //rclcpp::Duration timeout = rclcpp::Duration(5,0);
+    //currentRobot->controller_manager_->switch_controller(start_controllers, stop_controllers, controller_manager_msgs::srv::SwitchController::Request::STRICT,true, timeout);
+    //std::cout << "CONTROLLERS STARTED" << std::endl;
 
     if (!currentRobot->controller_manager_->has_parameter("update_rate")) {
       RCLCPP_ERROR_STREAM(this->ignRos2ControlPtr->ign_ros2_control_node->get_logger(), "controller manager doesn't have an update_rate parameter");
