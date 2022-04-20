@@ -255,6 +255,8 @@ namespace ign_ros2_control {
     const YAML::Node &node = config["controller_manager"]["ros__parameters"];
     std::vector<std::string> start_controllers;
     std::vector<std::string> stop_controllers;
+    std::string ntu_gazebo_share_directory = ament_index_cpp::get_package_share_directory("ntu_gazebo");
+
     for(const auto& it : node ){
 
       //std::cout << "CONTROLLER ENTREI: " + it.first.as<std::string>() << std::endl;
@@ -275,8 +277,6 @@ namespace ign_ros2_control {
         //std::cout << "CONTROLLER: " + prefix + it.first.as<std::string>()+".type" << std::endl;
         //std::cout << it.second["type"].as<std::string>() << std::endl;
         currentRobot->controller_manager_->load_controller(controller_name , controller_type);
-
-        std::string ntu_gazebo_share_directory = ament_index_cpp::get_package_share_directory("ntu_gazebo");
 
         std::string cmd = "ros2 param load " + controller_name + " "+ ntu_gazebo_share_directory + it.second["filepath"].as<std::string>();
         std::system(cmd.c_str());
