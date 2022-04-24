@@ -181,7 +181,22 @@ namespace ign_ros2_control
 
       size_t data_index = sensorData->interface_name_map.at(state_interface.name);
 
-      this->dataPtr->state_interfaces_.emplace_back(sensorData->name, state_interface.name, &sensorData->sensor_data_[data_index]);
+      if(sensorData->type == "imu"){
+        this->dataPtr->state_interfaces_.emplace_back(sensorData->name, state_interface.name, &sensorData->sensor_data_[data_index]);
+      }
+
+      else if(sensorData->type == "lidar"){
+        if(state_interface.name != "ranges_init" && state_interface.name != "intensities_init")
+          this->dataPtr->state_interfaces_.emplace_back(sensorData->name, state_interface.name, &sensorData->sensor_data_[data_index]);
+        else{
+          if(state_interface.name == "ranges_init")
+            this->dataPtr->state_interfaces_.emplace_back(sensorData->name, state_interface.name, &sensorData->array_data_[0][0], &sensorData->array_data_[0]);
+
+          else if(state_interface.name == "intensities_init")
+            this->dataPtr->state_interfaces_.emplace_back(sensorData->name, state_interface.name, &sensorData->array_data_[1][0], &sensorData->array_data_[1]);
+          
+        }
+      }
     }
   }
 
@@ -212,6 +227,7 @@ namespace ign_ros2_control
         if (sensorName.find("imu") != std::string::npos){
           auto sensorData = std::make_shared<ImuData>();
           sensorData->name = _name->Data();
+          sensorData->type = "imu";
           sensorData->sim_sensors_ = _entity;
           this->configureSensor<ImuData>(sensorData, sensor_components_, sensorName);
           this->dataPtr->imus_.push_back(sensorData);
@@ -219,6 +235,7 @@ namespace ign_ros2_control
         else if (sensorName.find("lidar") != std::string::npos){
           auto sensorData = std::make_shared<LidarData>();
           sensorData->name = _name->Data();
+          sensorData->type = "lidar";
           sensorData->sim_sensors_ = _entity;
           this->configureSensor<LidarData>(sensorData, sensor_components_, sensorName);
           this->dataPtr->lidars_.push_back(sensorData);

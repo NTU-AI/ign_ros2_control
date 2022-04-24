@@ -75,13 +75,16 @@ struct jointData
 
 class SensorData{
   public:
-    /// \brief imu's name.
+    /// \brief sensors's name.
     std::string name{};
 
-    /// \brief imu's topic name.
+    /// \brief sensors's type.
+    std::string type{};
+
+    /// \brief sensors's topic name.
     std::string topicName{};
 
-    /// \brief handles to the imu from within Gazebo
+    /// \brief handles to the sensors from within Gazebo
     ignition::gazebo::Entity sim_sensors_ = ignition::gazebo::kNullEntity;
 };
 
@@ -90,6 +93,8 @@ class ImuData : public SensorData
   public:
     /// \brief An array per IMU with 4 orientation, 3 angular velocity and 3 linear acceleration
     std::array<double, 10> sensor_data_;
+
+    std::array<std::array<double,25>,2> array_data_;
 
     const std::map<std::string, size_t> interface_name_map = {
         {"orientation.x", 0},
@@ -126,7 +131,9 @@ class LidarData : public SensorData
 {
 public:
   /// \brief An array per IMU with 4 orientation, 3 angular velocity and 3 linear acceleration
-  std::array<double, 9> sensor_data_;
+  std::array<double, 11> sensor_data_;
+
+  std::array<std::array<double,25>,2> array_data_;
 
   const std::map<std::string, size_t> interface_name_map = {
       {"angle_min", 0},
@@ -136,6 +143,10 @@ public:
       {"scan_time", 4},
       {"range_min", 5},
       {"range_max", 6},
+      {"ranges_init", 7},
+      {"ranges_size", 8},
+      {"intensities_init", 9},
+      {"intensities_size", 10},
       //{"ranges", 7},
       //{"intensities", 8},
   };
@@ -151,8 +162,18 @@ void LidarData::OnLIDAR(const ignition::msgs::LaserScan &_msg)
   this->sensor_data_[2] = _msg.angle_step();
   this->sensor_data_[3] = 5.0;
   this->sensor_data_[4] = 6.0;
-  this->sensor_data_[5] = _msg.angle_min();
-  this->sensor_data_[6] = _msg.angle_max();
+  this->sensor_data_[5] = _msg.range_min();
+  this->sensor_data_[6] = _msg.range_max();
+  //this->sensor_data_[7] = _msg.ranges()[0];
+  this->sensor_data_[8] = _msg.ranges_size();
+  //this->sensor_data_[9] = _msg.intensities()[0];
+  this->sensor_data_[10] = _msg.intensities_size();
+
+  for(int i=0; i<_msg.ranges_size(); i++)
+    this->array_data_[0][i] = _msg.ranges()[i];
+
+  for(int i=0; i<_msg.intensities_size(); i++)
+    this->array_data_[1][i] = _msg.intensities()[i];
   // this->lidar_sensor_data_[7] = _msg.ranges();
   // this->lidar_sensor_data_[8] = _msg.intensities();
 }
