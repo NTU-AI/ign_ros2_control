@@ -186,14 +186,14 @@ namespace ign_ros2_control
       }
 
       else if(sensorData->type == "lidar"){
-        if(state_interface.name != "ranges_init" && state_interface.name != "intensities_init")
+        if(state_interface.name != "ranges" && state_interface.name != "intensities")
           this->dataPtr->state_interfaces_.emplace_back(sensorData->name, state_interface.name, &sensorData->sensor_data_[data_index]);
         else{
-          if(state_interface.name == "ranges_init")
-            this->dataPtr->state_interfaces_.emplace_back(sensorData->name, state_interface.name, &sensorData->array_data_[0][0], &sensorData->array_data_[0]);
+          if(state_interface.name == "ranges")
+            this->dataPtr->state_interfaces_.emplace_back(sensorData->name, state_interface.name, &sensorData->sensor_array_data_[0][0], &sensorData->sensor_array_data_[0]);
 
-          else if(state_interface.name == "intensities_init")
-            this->dataPtr->state_interfaces_.emplace_back(sensorData->name, state_interface.name, &sensorData->array_data_[1][0], &sensorData->array_data_[1]);
+          else if(state_interface.name == "intensities")
+            this->dataPtr->state_interfaces_.emplace_back(sensorData->name, state_interface.name, &sensorData->sensor_array_data_[1][0], &sensorData->sensor_array_data_[1]);
           
         }
       }
@@ -330,7 +330,7 @@ namespace ign_ros2_control
         //ignition::gazebo::components::SensorTopic* sensorTopicComp = this->dataPtr->ecm->Component<ignition::gazebo::components::SensorTopic>(this->dataPtr->lidars_[i]->sim_sensors_);
 
         if (this->loopOnce){ 
-          this->dataPtr->lidars_[i]->topicName = "lidar"; //sensorTopicComp->Data();
+          this->dataPtr->lidars_[i]->topicName = this->dataPtr->lidars_[i]->name +  "/lidar"; //sensorTopicComp->Data();
           //std::cout << "Sensor Topic: "<< this->dataPtr->lidars_[i]->topicName << std::endl;
           RCLCPP_INFO_STREAM(this->nh_->get_logger(), "LIDAR " << this->dataPtr->lidars_[i]->name << " has a topic name: " << this->dataPtr->lidars_[i]->topicName);
 

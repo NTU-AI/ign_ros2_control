@@ -86,16 +86,18 @@ class SensorData{
 
     /// \brief handles to the sensors from within Gazebo
     ignition::gazebo::Entity sim_sensors_ = ignition::gazebo::kNullEntity;
+
+    /// \brief 1 dimensional array that constains all unique properties for sensors
+    std::vector<double> sensor_data_;
+
+    /// \brief multidimensional array that constains all array properties for sensors
+    std::vector<std::vector<double>> sensor_array_data_;
 };
 
 class ImuData : public SensorData
 {
   public:
     /// \brief An array per IMU with 4 orientation, 3 angular velocity and 3 linear acceleration
-    std::array<double, 10> sensor_data_;
-
-    std::array<std::array<double,25>,2> array_data_;
-
     const std::map<std::string, size_t> interface_name_map = {
         {"orientation.x", 0},
         {"orientation.y", 1},
@@ -108,6 +110,10 @@ class ImuData : public SensorData
         {"linear_acceleration.y", 8},
         {"linear_acceleration.z", 9},
     };
+
+    ImuData(){
+      this->sensor_data_.resize(10);
+    }
 
     /// \brief callback to get the IMU topic values
     void OnIMU(const ignition::msgs::IMU &_msg);
@@ -130,11 +136,7 @@ void ImuData::OnIMU(const ignition::msgs::IMU &_msg)
 class LidarData : public SensorData
 {
 public:
-  /// \brief An array per IMU with 4 orientation, 3 angular velocity and 3 linear acceleration
-  std::array<double, 11> sensor_data_;
-
-  std::array<std::array<double,25>,2> array_data_;
-
+  /// \brief An array per LIDAR with angle_min, angle_max, angle_increment, time_increment, scan_time, range_min, range_max, ranges_size, intensities_size, ranges, intensities
   const std::map<std::string, size_t> interface_name_map = {
       {"angle_min", 0},
       {"angle_max", 1},
@@ -143,13 +145,18 @@ public:
       {"scan_time", 4},
       {"range_min", 5},
       {"range_max", 6},
-      {"ranges_init", 7},
-      {"ranges_size", 8},
-      {"intensities_init", 9},
-      {"intensities_size", 10},
-      //{"ranges", 7},
-      //{"intensities", 8},
+      {"ranges_size", 7},
+      {"intensities_size", 8},
+      {"ranges", 9},
+      {"intensities", 10},
   };
+
+  LidarData(){
+    this->sensor_data_.resize(9);
+    this->sensor_array_data_.resize(2);
+    this->sensor_array_data_[0].resize(1);
+    this->sensor_array_data_[1].resize(1);
+  }
 
   /// \brief callback to get the IMU topic values
   void OnLIDAR(const ignition::msgs::LaserScan &_msg);
@@ -160,22 +167,23 @@ void LidarData::OnLIDAR(const ignition::msgs::LaserScan &_msg)
   this->sensor_data_[0] = _msg.angle_min();
   this->sensor_data_[1] = _msg.angle_max();
   this->sensor_data_[2] = _msg.angle_step();
-  this->sensor_data_[3] = 5.0;
-  this->sensor_data_[4] = 6.0;
+  this->sensor_data_[3] = 5.0; // valores default, arrumar para time_increment
+  this->sensor_data_[4] = 6.0; // valores default, arrumar para scan_time
   this->sensor_data_[5] = _msg.range_min();
   this->sensor_data_[6] = _msg.range_max();
-  //this->sensor_data_[7] = _msg.ranges()[0];
-  this->sensor_data_[8] = _msg.ranges_size();
-  //this->sensor_data_[9] = _msg.intensities()[0];
-  this->sensor_data_[10] = _msg.intensities_size();
 
+  this->sensor_data_[7] = _msg.ranges_size();
+  this->sensor_array_data_[0].resize(_msg.ranges_size());
+
+  this->sensor_data_[8] = _msg.intensities_size();
+  this->sensor_array_data_[1].resize(_msg.ranges_size());
+  
   for(int i=0; i<_msg.ranges_size(); i++)
-    this->array_data_[0][i] = _msg.ranges()[i];
+    this->sensor_array_data_[0][i] = _msg.ranges()[i];
 
   for(int i=0; i<_msg.intensities_size(); i++)
-    this->array_data_[1][i] = _msg.intensities()[i];
-  // this->lidar_sensor_data_[7] = _msg.ranges();
-  // this->lidar_sensor_data_[8] = _msg.intensities();
+    this->sensor_array_data_[1][i] = _msg.intensities()[i];  
+
 }
 
 namespace ign_ros2_control
