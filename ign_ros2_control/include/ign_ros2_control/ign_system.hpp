@@ -186,43 +186,46 @@ void LidarData::OnLIDAR(const ignition::msgs::LaserScan &_msg)
 
 }
 
-// class CameraData : public SensorData
-// {
-// public:
-//   /// \brief An array per IMU with 4 orientation, 3 angular velocity and 3 linear acceleration
-//   std::array<double, 6> sensor_data_;
+class CameraData : public SensorData
+{
+public:
+  /// \brief An array per IMU with 4 orientation, 3 angular velocity and 3 linear acceleration
 
-//   std::array<std::array<double,25>,1> array_data_;
+  const std::map<std::string, size_t> interface_name_map = {
+      {"height", 0},
+      {"width", 1},
+      {"encoding", 2},
+      {"is_bigendian", 3},
+      {"step", 4},
+      {"data_size", 5},
+      {"data", 6},
+  };
 
-//   const std::map<std::string, size_t> interface_name_map = {
-//       {"height", 0},
-//       {"width", 1},
-//       {"encoding", 2},
-//       {"is_bigendian", 3},
-//       {"step", 4},
-//       {"data", 5},
-//       {"data_size", 6},
-//   };
+  CameraData(){
+    this->sensor_data_.resize(6);
+    this->sensor_array_data_.resize(1);
+    this->sensor_array_data_[0].resize(1);
+  }
 
-//   /// \brief callback to get the IMU topic values
-//   void OnCAMERA(const ignition::msgs::Image &_msg);
-// };
+  /// \brief callback to get the IMU topic values
+  void OnCAMERA(const ignition::msgs::Image &_msg);
+};
 
-// void CameraData::OnCAMERA(const ignition::msgs::Image &_msg)
-// {
-//   this->sensor_data_[0] = (double) _msg.height(); 
-//   this->sensor_data_[1] = (double) _msg.width();
-//   this->sensor_data_[2] = _msg.pixel_format_type();
-//   this->sensor_data_[3] = true;
-//   this->sensor_data_[4] = _msg.step();
-//   //this->sensor_data_[5] = _msg.data();
-//   this->sensor_data_[6] = _msg.data().length();
+void CameraData::OnCAMERA(const ignition::msgs::Image &_msg)
+{
+  std::cout << std::to_string(_msg.pixel_format_type()) << std::endl;
 
-  //std::cout << std::to_string(_msg.pixel_format_type()); << std::endl;
+  this->sensor_data_[0] = (double) _msg.height(); 
+  this->sensor_data_[1] = (double) _msg.width();
+  this->sensor_data_[2] = (double) _msg.pixel_format_type();
+  this->sensor_data_[3] = 0.0;
+  this->sensor_data_[4] = (double) _msg.step();
+  //this->sensor_data_[5] = _msg.data();
+  this->sensor_data_[5] = (double) _msg.data().length();
 
 
   for(int i=0; i< _msg.data().length(); i++)
-    this->array_data_[0][i] = _msg.data()[i];
+    this->sensor_array_data_[0][i] = _msg.data()[i];
 }
 
 namespace ign_ros2_control
@@ -243,10 +246,10 @@ namespace ign_ros2_control
     /// \brief vector with the imus .
     std::vector<std::shared_ptr<ImuData>> imus_;
 
-    /// \brief vector with the lidar .
+    /// \brief vector with the lidars.
     std::vector<std::shared_ptr<LidarData>> lidars_;
 
-    /// \brief vector with the lidar .
+    /// \brief vector with the cameras .
     std::vector<std::shared_ptr<CameraData>> cameras_;
 
     /// \brief state interfaces that will be exported to the Resource Manager

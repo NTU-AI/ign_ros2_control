@@ -198,13 +198,16 @@ namespace ign_ros2_control
           
         }
       }
-      // else if (sensorData->type == "camera")
-      // {
-      //   if (state_interface.name != "data")
-      //   {
-      //     this->dataPtr->state_interfaces_.emplace_back(sensorData->name, state_interface.name, &sensorData->sensor_data_[data_index]);
-      //   }
-      // }
+      else if (sensorData->type == "camera")
+      {
+        if (state_interface.name != "data")
+        {
+          this->dataPtr->state_interfaces_.emplace_back(sensorData->name, state_interface.name, &sensorData->sensor_data_[data_index]);
+        }
+        else{
+          this->dataPtr->state_interfaces_.emplace_back(sensorData->name, state_interface.name, &sensorData->sensor_array_data_[0][0], &sensorData->sensor_array_data_[0]);
+        }
+      }
     }
   }
 
@@ -250,15 +253,15 @@ namespace ign_ros2_control
             this->configureSensor<LidarData>(sensorData, sensor_components_, sensorName);
             this->dataPtr->lidars_.push_back(sensorData);
           }
-          // else if (sensorName.find("camera") != std::string::npos)
-          // {
-          //   auto sensorData = std::make_shared<CameraData>();
-          //   sensorData->name = _name->Data();
-          //   sensorData->type = "camera";
-          //   sensorData->sim_sensors_ = _entity;
-          //   this->configureSensor<CameraData>(sensorData, sensor_components_, sensorName);
-          //   this->dataPtr->cameras_.push_back(sensorData);
-          // }
+          else if (sensorName.find("camera") != std::string::npos)
+          {
+            auto sensorData = std::make_shared<CameraData>();
+            sensorData->name = _name->Data();
+            sensorData->type = "camera";
+            sensorData->sim_sensors_ = _entity;
+            this->configureSensor<CameraData>(sensorData, sensor_components_, sensorName);
+            this->dataPtr->cameras_.push_back(sensorData);
+          }
           return true;
         });
   }
