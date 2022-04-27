@@ -200,8 +200,7 @@ namespace ign_ros2_control
       }
       else if (sensorData->type == "camera")
       {
-        if (state_interface.name != "data")
-        {
+        if (state_interface.name != "data"){
           this->dataPtr->state_interfaces_.emplace_back(sensorData->name, state_interface.name, &sensorData->sensor_data_[data_index]);
         }
         else{
@@ -326,16 +325,15 @@ namespace ign_ros2_control
     {
       if (this->dataPtr->imus_[i]->topicName.empty())
       {
-        auto sensorTopicComp = this->dataPtr->ecm->Component<
-            ignition::gazebo::components::SensorTopic>(this->dataPtr->imus_[i]->sim_sensors_);
+        //auto sensorTopicComp = this->dataPtr->ecm->Component<
+        //    ignition::gazebo::components::SensorTopic>(this->dataPtr->imus_[i]->sim_sensors_);
 
         // std::cout << "Handle ID: "<< this->dataPtr->imus_[i]->sim_sensors_ << std::endl;
-        if (sensorTopicComp)
-        {
+        if (this->loopOnce){ 
 
-          this->dataPtr->imus_[i]->topicName = sensorTopicComp->Data();
+          this->dataPtr->imus_[i]->topicName = this->dataPtr->imus_[i]->name +  "/imu";
           RCLCPP_INFO_STREAM(
-              this->nh_->get_logger(), "IMU " << this->dataPtr->imus_[i]->name << " has a topic name: " << sensorTopicComp->Data());
+              this->nh_->get_logger(), "IMU " << this->dataPtr->imus_[i]->name << " has a topic name: " << this->dataPtr->imus_[i]->topicName);
 
           this->dataPtr->node.Subscribe(
               this->dataPtr->imus_[i]->topicName, &ImuData::OnIMU,
@@ -360,22 +358,22 @@ namespace ign_ros2_control
       }
     }
 
-    // for (unsigned int i = 0; i < this->dataPtr->cameras_.size(); ++i)
-    // {
-    //   if (this->dataPtr->cameras_[i]->topicName.empty())
-    //   {
-    //     // ignition::gazebo::components::SensorTopic* sensorTopicComp = this->dataPtr->ecm->Component<ignition::gazebo::components::SensorTopic>(this->dataPtr->lidars_[i]->sim_sensors_);
+    for (unsigned int i = 0; i < this->dataPtr->cameras_.size(); ++i)
+    {
+      if (this->dataPtr->cameras_[i]->topicName.empty())
+      {
+        // ignition::gazebo::components::SensorTopic* sensorTopicComp = this->dataPtr->ecm->Component<ignition::gazebo::components::SensorTopic>(this->dataPtr->lidars_[i]->sim_sensors_);
 
-    //     if (this->loopOnce)
-    //     {
-    //       this->dataPtr->cameras_[i]->topicName = "camera"; // sensorTopicComp->Data();
-    //       // std::cout << "Sensor Topic: "<< this->dataPtr->cameras_[i]->topicName << std::endl;
-    //       RCLCPP_INFO_STREAM(this->nh_->get_logger(), "CAMERA " << this->dataPtr->cameras_[i]->name << " has a topic name: " << this->dataPtr->cameras_[i]->topicName);
+        if (this->loopOnce){ 
+          this->dataPtr->cameras_[i]->topicName = this->dataPtr->cameras_[i]->name +  "/cam/image"; //sensorTopicComp->Data();
+          //std::cout << "Sensor Topic: "<< this->dataPtr->lidars_[i]->topicName << std::endl;
+          RCLCPP_INFO_STREAM(this->nh_->get_logger(), "CAMERA " << this->dataPtr->cameras_[i]->name << " has a topic name: " << this->dataPtr->cameras_[i]->topicName);
 
-    //       this->dataPtr->node.Subscribe(this->dataPtr->cameras_[i]->topicName, &CameraData::OnCAMERA, this->dataPtr->cameras_[i].get());
-    //     }
-    //   }
-    // }
+          this->dataPtr->node.Subscribe(this->dataPtr->cameras_[i]->topicName, &CameraData::OnCAMERA, this->dataPtr->cameras_[i].get());
+        }
+      }
+    }
+  
 
     this->loopOnce = false;
     return hardware_interface::return_type::OK;

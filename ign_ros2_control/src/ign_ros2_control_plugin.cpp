@@ -246,7 +246,7 @@ namespace ign_ros2_control {
     }
 
     std::string paramFileName = currentRobot->getParamFilePath();
-    std::string robot_name = currentRobot->getName();
+    std::string robot_name = currentRobot->getName(); 
 
     this->configHardwarePlugin(urdf_string, enabledJoints, currentRobot, _ecm);
 
@@ -294,6 +294,7 @@ namespace ign_ros2_control {
     }
     cmd = cmd + " &";
     std::system(cmd.c_str());
+
     //rclcpp::Duration timeout = rclcpp::Duration(5,0);
     //currentRobot->controller_manager_->switch_controller(start_controllers, stop_controllers, controller_manager_msgs::srv::SwitchController::Request::STRICT,true, timeout);
     //std::cout << "CONTROLLERS STARTED" << std::endl;

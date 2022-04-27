@@ -20,13 +20,16 @@
 #include <string>
 #include <vector>
 #include <utility>
+#include <cstdlib>
 
 #include <ignition/msgs/imu.pb.h>
 #include <ignition/msgs/laserscan.pb.h>
+#include <ignition/msgs/image.pb.h>
 
 #include <ignition/gazebo/components/AngularVelocity.hh>
 #include <ignition/gazebo/components/Imu.hh>
 #include <ignition/gazebo/components/Lidar.hh>
+#include <ignition/gazebo/components/Camera.hh>
 #include <ignition/gazebo/components/JointForce.hh>
 #include <ignition/gazebo/components/JointForceCmd.hh>
 #include <ignition/gazebo/components/JointPosition.hh>
@@ -167,8 +170,8 @@ void LidarData::OnLIDAR(const ignition::msgs::LaserScan &_msg)
   this->sensor_data_[0] = _msg.angle_min();
   this->sensor_data_[1] = _msg.angle_max();
   this->sensor_data_[2] = _msg.angle_step();
-  this->sensor_data_[3] = 5.0; // valores default, arrumar para time_increment
-  this->sensor_data_[4] = 6.0; // valores default, arrumar para scan_time
+  this->sensor_data_[3] = 0.1; // valores default, arrumar para time_increment
+  this->sensor_data_[4] = 0.1; // valores default, arrumar para scan_time
   this->sensor_data_[5] = _msg.range_min();
   this->sensor_data_[6] = _msg.range_max();
 
@@ -189,7 +192,7 @@ void LidarData::OnLIDAR(const ignition::msgs::LaserScan &_msg)
 class CameraData : public SensorData
 {
 public:
-  /// \brief An array per IMU with 4 orientation, 3 angular velocity and 3 linear acceleration
+  /// \brief An array per CAMERA with height, width, encoding, is_bigendian, step, data_size e data
 
   const std::map<std::string, size_t> interface_name_map = {
       {"height", 0},
@@ -213,19 +216,23 @@ public:
 
 void CameraData::OnCAMERA(const ignition::msgs::Image &_msg)
 {
-  std::cout << std::to_string(_msg.pixel_format_type()) << std::endl;
+  //std::cout << std::to_string(_msg.pixel_format_type()) << std::endl;
 
   this->sensor_data_[0] = (double) _msg.height(); 
   this->sensor_data_[1] = (double) _msg.width();
   this->sensor_data_[2] = (double) _msg.pixel_format_type();
-  this->sensor_data_[3] = 0.0;
+  this->sensor_data_[3] = 0.0; // is_bigendien FALSE = 0
   this->sensor_data_[4] = (double) _msg.step();
-  //this->sensor_data_[5] = _msg.data();
-  this->sensor_data_[5] = (double) _msg.data().length();
+  this->sensor_data_[5] = (double) _msg.data().size();
 
+  this->sensor_array_data_[0].resize(_msg.data().size());
 
-  for(int i=0; i< _msg.data().length(); i++)
-    this->sensor_array_data_[0][i] = _msg.data()[i];
+  auto imageData =  reinterpret_cast<const unsigned char *>(_msg.data().c_str());
+
+  for(int i=0; i< _msg.data().size(); i++){
+    //std::cout << "PIXEL " << i << ": " << (double) imageData[i] << std::endl;
+    this->sensor_array_data_[0][i] = (double) imageData[i];
+  }
 }
 
 namespace ign_ros2_control
