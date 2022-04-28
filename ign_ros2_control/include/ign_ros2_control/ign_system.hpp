@@ -212,8 +212,8 @@ public:
 
   CameraData(){
     this->sensor_int_data_.resize(6);
-    this->sensor_array_data_.resize(1);
-    this->sensor_array_data_[0].resize(1);
+    this->sensor_str_data_.resize(1);
+    //this->sensor_array_data_[0].resize(1);
   }
 
   /// \brief callback to get the IMU topic values
