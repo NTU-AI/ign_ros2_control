@@ -204,7 +204,7 @@ namespace ign_ros2_control
           this->dataPtr->state_interfaces_.emplace_back(sensorData->name, state_interface.name, &sensorData->sensor_data_[data_index]);
         }
         else{
-          this->dataPtr->state_interfaces_.emplace_back(sensorData->name, state_interface.name, "teste", &sensorData->sensor_str_data_[0]);
+          this->dataPtr->state_interfaces_.emplace_back(sensorData->name, state_interface.name, &sensorData->sensor_array_data_[0][0], &sensorData->sensor_array_data_[0]);
         }
       }
     }
