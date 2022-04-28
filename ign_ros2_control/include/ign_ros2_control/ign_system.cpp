@@ -201,10 +201,10 @@ namespace ign_ros2_control
       else if (sensorData->type == "camera")
       {
         if (state_interface.name != "data"){
-          this->dataPtr->state_interfaces_.emplace_back(sensorData->name, state_interface.name, &sensorData->sensor_int_data_[data_index]);
+          this->dataPtr->state_interfaces_.emplace_back(sensorData->name, state_interface.name, &sensorData->sensor_data_[data_index]);
         }
         else{
-          this->dataPtr->state_interfaces_.emplace_back(sensorData->name, state_interface.name, &sensorData->sensor_str_data_[0]);
+          this->dataPtr->state_interfaces_.emplace_back(sensorData->name, state_interface.name, &sensorData->sensor_array_data_[0][0], &sensorData->sensor_array_data_[0]);
         }
       }
     }
