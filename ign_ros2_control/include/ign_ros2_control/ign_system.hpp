@@ -211,7 +211,7 @@ public:
   };
 
   CameraData(){
-    this->sensor_data_.resize(6);
+    this->sensor_int_data_.resize(6);
     this->sensor_array_data_.resize(1);
     this->sensor_array_data_[0].resize(1);
   }
@@ -223,12 +223,12 @@ public:
 void CameraData::OnCAMERA(const ignition::msgs::Image &_msg)
 {
   //std::cout << std::to_string(_msg.pixel_format_type()) << std::endl;
-  this->sensor_data_[0] = (double) _msg.height(); 
-  this->sensor_data_[1] = (double) _msg.width();
-  this->sensor_data_[2] = (double) _msg.pixel_format_type();
-  this->sensor_data_[3] = (double) 0.0; // is_bigendien FALSE = 0
-  this->sensor_data_[4] = (double) _msg.step();
-  this->sensor_data_[5] = (double) _msg.data().size();
+  this->sensor_int_data_[0] = (int) _msg.height(); 
+  this->sensor_int_data_[1] = (int) _msg.width();
+  this->sensor_int_data_[2] = (int) _msg.pixel_format_type();
+  this->sensor_int_data_[3] = (int) 0.0; // is_bigendien FALSE = 0
+  this->sensor_int_data_[4] = (int) _msg.step();
+  this->sensor_int_data_[5] = (int) _msg.data().size();
 
   this->sensor_array_data_[0].resize(_msg.data().size());
 
