@@ -230,21 +230,22 @@ void CameraData::OnCAMERA(const ignition::msgs::Image &_msg)
   this->sensor_data_[4] = (double) _msg.step();
   this->sensor_data_[5] = (double) _msg.data().size();
 
-  // this->sensor_array_data_[0].resize(_msg.data().size());
-
-  // auto imageData =  reinterpret_cast<const unsigned char *>(_msg.data().c_str());
-
-  // for(int i=0; i< _msg.data().size(); i++){
-  //   //std::cout << "PIXEL " << i << ": " << (double) imageData[i] << std::endl;
-  //   this->sensor_array_data_[0][i] = (double) imageData[i];
-  // }
-
   this->sensor_str_data_[0].resize(_msg.data().size());
 
-  std::cout << "IGN TESTE 1" << std::endl;
-  this->sensor_str_data_[0] = _msg.data().c_str();
-  std::cout << "DATA: "<< _msg.data() << std::endl;
-  std::cout << "IGN TESTE 2" << std::endl;
+  auto imageData =  reinterpret_cast<const unsigned char *>(_msg.data().c_str());
+
+  for(int i=0; i< _msg.data().size(); i++){
+    std::cout << "PIXEL " << i << ": " << (std::string) imageData[i] << std::endl;
+    this->sensor_str_data_[0][i] = (std::string) imageData[i];
+  }
+
+  //this->sensor_str_data_[0].resize(_msg.data().size());
+
+  //std::cout << "IGN TESTE 1" << std::endl;
+  
+  //this->sensor_str_data_[0] = _msg.data().c_str();
+  //std::cout << "DATA: "<< _msg.data() << std::endl;
+  //std::cout << "IGN TESTE 2" << std::endl;
 
 }
 
