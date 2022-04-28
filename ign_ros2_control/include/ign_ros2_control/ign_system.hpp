@@ -231,7 +231,10 @@ void CameraData::OnCAMERA(const ignition::msgs::Image &_msg)
   this->sensor_int_data_[4] = _msg.step();
   this->sensor_int_data_[5] = _msg.data().size();
 
-  this->sensor_str_data_[0] = _msg.data().size();
+  std::cout << "IGN TESTE 1" << std::endl;
+  this->sensor_str_data_[0] = _msg.data();
+  std::cout << "DATA: "<< _msg.data() << std::endl;
+  std::cout << "IGN TESTE 2" << std::endl;
 
 }
 
