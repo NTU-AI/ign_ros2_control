@@ -112,26 +112,31 @@ namespace ign_ros2_control
       // register the state handles
       for (unsigned int i = 0; i < hardware_info.joints[k].state_interfaces.size(); ++i)
       {
+
+        hardware_interface::StateInterface *newSI; 
+
         if (hardware_info.joints[k].state_interfaces[i].name == "position")
         {
           RCLCPP_INFO_STREAM(this->nh_->get_logger(), "\t\t position");
 
-          this->dataPtr->state_interfaces_.emplace_back(joint_name, hardware_interface::HW_IF_POSITION, &this->dataPtr->joints_[j].joint_position);
+          newSI = new hardware_interface::StateInterface(joint_name, hardware_interface::HW_IF_POSITION, &this->dataPtr->joints_[j].joint_position);
         }
 
         if (hardware_info.joints[k].state_interfaces[i].name == "velocity")
         {
           RCLCPP_INFO_STREAM(this->nh_->get_logger(), "\t\t velocity");
 
-          this->dataPtr->state_interfaces_.emplace_back(joint_name, hardware_interface::HW_IF_VELOCITY, &this->dataPtr->joints_[j].joint_velocity);
+          newSI = new hardware_interface::StateInterface(joint_name, hardware_interface::HW_IF_VELOCITY, &this->dataPtr->joints_[j].joint_velocity);
         }
 
         if (hardware_info.joints[k].state_interfaces[i].name == "effort")
         {
           RCLCPP_INFO_STREAM(this->nh_->get_logger(), "\t\t effort");
 
-          this->dataPtr->state_interfaces_.emplace_back(joint_name, hardware_interface::HW_IF_EFFORT, &this->dataPtr->joints_[j].joint_effort);
+          newSI = new hardware_interface::StateInterface(joint_name, hardware_interface::HW_IF_EFFORT, &this->dataPtr->joints_[j].joint_effort);
         }
+
+        this->dataPtr->state_interfaces_.push_back(*newSI);
       }
 
       // this->dataPtr->joints_.push_back(this->dataPtr->joints_[j]);
@@ -181,32 +186,36 @@ namespace ign_ros2_control
 
       size_t data_index = sensorData->interface_name_map.at(state_interface.name);
 
+      hardware_interface::StateInterface *newSI; 
+
       if (sensorData->type == "imu")
       {
-        this->dataPtr->state_interfaces_.emplace_back(sensorData->name, state_interface.name, &sensorData->sensor_data_[data_index]);
+        newSI = new hardware_interface::StateInterface(sensorData->name, state_interface.name, &sensorData->sensor_data_[data_index]);
       }
 
       else if(sensorData->type == "lidar"){
         if(state_interface.name != "ranges" && state_interface.name != "intensities")
-          this->dataPtr->state_interfaces_.emplace_back(sensorData->name, state_interface.name, &sensorData->sensor_data_[data_index]);
+          newSI = new hardware_interface::StateInterface(sensorData->name, state_interface.name, &sensorData->sensor_data_[data_index]);
         else{
           if(state_interface.name == "ranges")
-            this->dataPtr->state_interfaces_.emplace_back(sensorData->name, state_interface.name, &sensorData->sensor_array_data_[0][0], &sensorData->sensor_array_data_[0]);
+            newSI = new hardware_interface::StateInterface(sensorData->name, state_interface.name, &sensorData->sensor_array_data_[0]);
 
           else if(state_interface.name == "intensities")
-            this->dataPtr->state_interfaces_.emplace_back(sensorData->name, state_interface.name, &sensorData->sensor_array_data_[1][0], &sensorData->sensor_array_data_[1]);
+            newSI = new hardware_interface::StateInterface(sensorData->name, state_interface.name, &sensorData->sensor_array_data_[1]);
           
         }
       }
       else if (sensorData->type == "camera")
       {
         if (state_interface.name != "data"){
-          this->dataPtr->state_interfaces_.emplace_back(sensorData->name, state_interface.name, &sensorData->sensor_data_[data_index]);
+          newSI = new hardware_interface::StateInterface(sensorData->name, state_interface.name, &sensorData->sensor_int_data_[data_index]);
         }
         else{
-          this->dataPtr->state_interfaces_.emplace_back(sensorData->name, state_interface.name, &sensorData->sensor_array_data_[0][0], &sensorData->sensor_array_data_[0]);
+          newSI = new hardware_interface::StateInterface(sensorData->name, state_interface.name, &sensorData->sensor_str_data_[0]);
         }
       }
+
+      this->dataPtr->state_interfaces_.push_back(*newSI);
     }
   }
 
