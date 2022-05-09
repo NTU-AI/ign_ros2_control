@@ -222,8 +222,6 @@ public:
 
 void CameraData::OnCAMERA(const ignition::msgs::Image &_msg)
 {
-  //std::cout << std::to_string(_msg.pixel_format_type()) << std::endl;
-
   this->sensor_int_data_[0] = _msg.height(); 
   this->sensor_int_data_[1] = _msg.width();
   this->sensor_int_data_[2] = _msg.pixel_format_type();
