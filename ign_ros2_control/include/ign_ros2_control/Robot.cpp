@@ -99,12 +99,12 @@ namespace ign_ros2_control{
 
     // void Robot::initRSP_Node(){
     //     // launching robot_state_publisher
-    //     std::string cmd = "ros2 launch ntu_gazebo models_rsp.launch.py model:='" + this->getModelType() +  "' model_name:='" + this->getName() + "' > /dev/null & ";
+    //     std::string cmd = "ros2 launch ntu_models models_rsp.launch.py model:='" + this->getModelType() +  "' model_name:='" + this->getName() + "' > /dev/null & ";
     //     std::system(cmd.c_str());
     // }
 
     //void Robot::launchControllers(){
-    //    std::string cmd = "ros2 launch ntu_gazebo models_sim.launch.py model:='" + this->getModelType() +  "' model_name:='" + this->getName() + "' &";
+    //    std::string cmd = "ros2 launch ntu_models models_sim.launch.py model:='" + this->getModelType() +  "' model_name:='" + this->getName() + "' &";
     //    std::system(cmd.c_str());
     //}
 
